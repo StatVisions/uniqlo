@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="node_modules/d3/d3.js"></script>
+	<script type="text/javascript" src="node_modules/crossfilter/crossfilter.js"></script>
+	<script type="text/javascript" src="node_modules/dc/dc.js"></script>
+	<link type="text/css" rel="stylesheet" href="node_modules/dc/dc.css">
+	<script type="text/javascript" src="node_modules/angular/angular.js"></script>
+	<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+	<script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+	<link type="text/css" rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+	<script type="text/javascript" src="node_modules/colorbrewer/colorbrewer.js"></script>
+	<script type="text/javascript" src="node_modules/topojson/topojson.js"></script>
+	<style>
+
+		.land {
+		  fill: #ddd;
+		}
+		
+		div.col-md-9 {
+			margin:20px;
+		}
+		.border {
+		  fill: none;
+		  stroke: #fff;
+		  stroke-linejoin: round;
+		  stroke-linecap: round;
+		}
+		table {
+			margin-left:5%;
+			margin-right:20%;
+			margin-top:5%;
+		}
+
+		table td {
+			padding:8px;
+		}
+		.tableauPlaceholder {
+			margin-left:5%;
+			margin-right:5%;
+			margin-top:5%;	
+		}
+	</style>
+</head>
+<body>
+	<div class="col-md-9" role="main">
+		<h1>Uniqlo</h1>
+		<div class="row">
+			<script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 1000px; height: 1195px;'><noscript><a href='#'><img alt=' ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;to&#47;toMae&#47;SocialUniverse&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' width='1000' height='1195' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='toMae&#47;SocialUniverse' /><param name='tabs' value='yes' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;to&#47;toMae&#47;SocialUniverse&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='showVizHome' value='no' /><param name='showTabs' value='y' /></object></div>
+		</div>
+		<div class="row" id="avatartable">
+		</div>
+	</div>
+
+
+	<script>
+		d3.csv("data/Uniqlo USA Influencer List for Mark Rios .csv",function(err,data){
+			
+			
+			////////////////////////////////////////////////
+			// ASSUMPTIONS /////////////////////////////////
+			////////////////////////////////////////////////
+
+			var sub = [["illustrations","art_media_design_photography"],
+				["illustrator","art_media_design_photography"],
+				["art","art_media_design_photography"],
+				["artist","art_media_design_photography"],
+				["creative","art_media_design_photography"],
+				["curator","art_media_design_photography"],
+				["design","art_media_design_photography"],
+				["designer","art_media_design_photography"],
+				["media","art_media_design_photography"],
+				["painter","art_media_design_photography"],
+				["graphic","art_media_design_photography"],
+				["photog","art_media_design_photography"],
+				["Photog","art_media_design_photography"],
+				["photographer","art_media_design_photography"],
+				["model","fashion_and_style"],
+				["beauty","fashion_and_style"],
+				["branding","fashion_and_style"],
+				["Claire","fashion_and_style"],
+				["fashion","fashion_and_style"],
+				["french","fashion_and_style"],
+				["ivanka","fashion_and_style"],
+				["Marie","fashion_and_style"],
+				["NYC","fashion_and_style"],
+				["sneakers","fashion_and_style"],
+				["style","fashion_and_style"],
+				["stylist","fashion_and_style"],
+				["trump","fashion_and_style"],
+				["vintage","fashion_and_style"],
+				["men's","fashion_and_style"],
+				["menswear","fashion_and_style"],
+				["mensweat","fashion_and_style"],
+				["director","film_and_music"],
+				["actor","film_and_music"],
+				["actress","film_and_music"],
+				["film","film_and_music"],
+				["humor","film_and_music"],
+				["music","film_and_music"],
+				["musician","film_and_music"],
+				["producer","film_and_music"],
+				["videographer","film_and_music"],
+				["Bruce","film_and_music"],
+				["DJ","film_and_music"],
+				["fitness","health_and_fitness"],
+				["health","health_and_fitness"],
+				["healthly","health_and_fitness"],
+				["running","health_and_fitness"],
+				["cars","lifestyle_food_and_travel"],
+				["blogger","lifestyle_food_and_travel"],
+				["social","lifestyle_food_and_travel"],
+				["foodie","lifestyle_food_and_travel"],
+				["interior","lifestyle_food_and_travel"],
+				[" family","lifestyle_food_and_travel"],
+				["culture","lifestyle_food_and_travel"],
+				["flight","lifestyle_food_and_travel"],
+				["lifestyle","lifestyle_food_and_travel"],
+				["living","lifestyle_food_and_travel"],
+				["planner","lifestyle_food_and_travel"],
+				["streetstyle","lifestyle_food_and_travel"],
+				["travel","lifestyle_food_and_travel"],
+				["travele","lifestyle_food_and_travel"],
+				["road","lifestyle_food_and_travel"],
+				["wife","lifestyle_food_and_travel"],
+				["dog","lifestyle_food_and_travel"],
+				["instagram","lifestyle_food_and_travel"],
+				["Magazine","international_fashion_publication"],
+				["editor","international_fashion_publication"],
+				["Editor","international_fashion_publication"],
+				["elle","international_fashion_publication"],
+				["GQ","international_fashion_publication"],
+				["mom","social_media_mom"],
+				["mommy","social_media_mom"],
+				["ambassador","news_politics_and_public_relations"],
+				["columnist","news_politics_and_public_relations"],
+				["Daily","news_politics_and_public_relations"],
+				["News","news_politics_and_public_relations"],
+				["Public","news_politics_and_public_relations"],
+				["football","outdoors_and_sports"],
+				["olympic","outdoors_and_sports"],
+				["outdoor","outdoors_and_sports"],
+				["outdoors","outdoors_and_sports"],
+				["skater","outdoors_and_sports"],
+				["sports","outdoors_and_sports"],
+				["Seahawks","outdoors_and_sports"],
+				["ballerina","performing_arts"],
+				["dancer","performing_arts"],
+				["developer","techies"],
+				["digital","techies"]];
+
+			var arrCity = 
+			[[/^(NYC|NYC \& LA)$/i,'New York'],
+			[/^LIC$/i,'Long Island City'],
+			[/(.*San Francisco.*)/,'San Francisco'],
+			[/(^SF$)|(San Francisco\|L.A.)/i,'San Francisco'],
+			[/^LA$/i,'Los Angeles'],
+			[/^DC$/i,'Washington'],
+			[/^(\w+( \w+)*)(\|)/i,'\1']
+			];
+
+			var arrState = [[/^(NYC)$/i,'NY'],[/^(Kansas)$/i,'KS']];
+
+			var arrHandle = [[/^(h(\w){2}p(s)*:\/\/instagram.com\/)(.)/i,'@\3']];
+
+			var blankFollowers = 9999;
+
+			var blankCity = "Springfield";
+
+			var blankNotes = "fashion";
+
+			var blankAvatarUrl = "data/download.jpeg";
+
+			var blankHandle = "99999999";
+
+			var numberFormat = d3.format(",.0f");
+
+			////////////////////////////////////////////////
+			////////////////////////////////////////////////
+			////////////////////////////////////////////////
+
+			var consolePrint = [];
+
+			function parse(d){
+				
+
+				// STRING CLEANUP
+				d.Followers = +d.Followers.replace(/,/g, '');
+				for(i = 0; i < arrCity.length; i++){
+					d.City = d.City.replace(arrCity[i][0],arrCity[i][1]);
+				}
+				for(i = 0; i < arrState.length; i++){
+					d.State = d.State.replace(arrState[i][0],arrState[i][1]);
+				}
+				if(d.Handle.length == 0) d.Handle = blankHandle;
+				for(i = 0; i < arrHandle.length; i++){
+					d.Handle = d.Handle.replace(arrHandle[i][0],arrHandle[i][1]);
+				}
+				// MISSING DATA
+				d.assumption = false;
+				d.missingHandle = false;
+				d.missingName = false;
+				d.missingAvatar = false;
+				d.missingCity = false;
+				d.missingNotes = false;
+				d.missingFollowers = false;
+				
+
+				if(d.City.length == 0) d.City = blankCity, d.missingCity = true; d.assumption = true;
+				if(d.Notes.length == 0) d.Notes = blankNotes, d.missingNotes = true; d.assumption = true;
+				if(d['Avatar URL'].length ==0) d['Avatar URL'] = blankAvatarUrl,d.assumption = true, missingAvatar = true;
+				if(d.Followers == 0) d.Followers = blankFollowers,d.missingFolowers = true; d.assumption = true;
+				if(d.Name.length == 0) d.Name = d.Handle.substring(1,Infinity), d.missingName = true;
+				if(d.Handle[0] != '@') d.Handle = '@' + d.Handle, d.missingHandle = true;
+
+				for(j = 0; j < sub.length; j++){
+					var re = new RegExp(sub[j][0].toString(), "gi");
+					if(d.Notes.search(re) > -1) d[sub[j][1]] = "Y", d.keyword = "Y";
+				}
+ 			}
+
+			data.forEach(parse);
+
+			data.sort(function(a,b){return d3.ascending(a['State'],b['State'])});
+
+			var table = d3.select("#avatartable").append("table").attr("class","table table-bordered table-striped");
+			
+
+			var tableHeaders = ["#","Handle","Avatar","City","State","Followers","Notes"];
+
+			var thead = table.append("thead").append("tr");
+
+			var tableHead = thead.selectAll("th")
+				.data(tableHeaders)
+				.enter()
+				.append("th")
+				.append("text")
+				.text(function(d){return d;});
+
+			var tbody = table.append("tbody");
+
+			var tableRows = table.selectAll("tr")
+				.data(data)
+				.enter()
+				.append("tr");
+
+			var row = tableRows
+				.append("th")
+				.attr("scope","row")
+				.append("text")
+				.text(function(d,i){return i;})
+
+			var avatarSrc = function(d) { return "<img src=\"" + d['Avatar URL'] + "\" style=\"width:80px; height:auto\;\">  "}
+
+			var columns = tableRows.selectAll("td")
+				.data(function(d){return [d.Handle, avatarSrc(d), d.City, d.State,numberFormat(d.Followers), d.Notes]})
+				.enter()
+				.append("td")
+				.style("text-align","right")
+				.html(function(d){return d;});
+
+			console.table(data);	
+
+			Array.prototype.getUnique = function(){
+			   var u = {}, a = [];
+			   for(var i = 0, l = this.length; i < l; ++i){
+			      if(u.hasOwnProperty(this[i])) {
+			         continue;
+			      }
+			      a.push(this[i]);
+			      u[this[i]] = 1;
+			   }
+			   return a;
+			}
+
+			var cities = [];
+			var states = [];
+
+			for(i = 0; i < data.length; i++){
+				cities.push(data[i].City + "," + data[i].State);
+			}
+
+			for(i = 0; i < data.length; i++){
+				states.push(data[i].State);
+			}
+
+
+			var citiesUnique = cities.getUnique();
+			var statesUnique = states.getUnique()
+
+			var c = {};
+			var s = {};
+
+			for(j = 0; j < citiesUnique.length; j++){
+				c[citiesUnique[j]] = 0; // initialize
+				for(i = 0; i < data.length; i++){
+					if(data[i].City + "," + data[i].State == citiesUnique[j]) {
+						c[citiesUnique[j]] = c[citiesUnique[j]]+ data[i].Followers;}
+				}
+			}
+			for(j = 0; j < statesUnique.length; j++){
+				s[statesUnique[j]] = 0; // initialize
+				for(i = 0; i < data.length; i++){
+					if(data[i].State == statesUnique[j]) {
+						s[statesUnique[j]] = s[statesUnique[j]]+ data[i].Followers;}
+				}
+			}
+			
+			// console.log(s);
+
+			// console.log(citiesUnique);
+			// console.log(c);
+
+
+
+
+			var notes = [];
+			var notesWords = [];
+
+			for(i = 0; i < data.length; i++){
+				notes.push(data[i]['Notes'].toString().split(/\/|,| /gi))
+			}
+
+			for(i = 0; i < notes.length; i++){
+				for(j = 0; j < notes[i].length; j++){
+					notesWords.push(notes[i][j])
+				}
+				
+			}
+
+			var uniqueWords = notesWords.getUnique().toString();
+
+			
+			var width = 960,
+			    height = 600;
+			
+			var svg = d3.select("body").append("svg")
+			    .attr("width", width)
+			    .attr("height", height);
+
+
+			
+			
+		
+	});
+	</script>
+	
+</body>
+</html>
